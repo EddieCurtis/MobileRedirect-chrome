@@ -5,8 +5,9 @@ chrome.webNavigation.onBeforeNavigate.addListener(function(request) {
     console.log(request.url);
     if (shouldRedirect(request.url)) {
       var newUrl = request.url.replace(/(m|mobile)\./i, "");
-      //TODO: I think this only works after the tab has been loaded, find a better way.
-      chrome.tabs.update(request.tabid, {url:newUrl});
+      chrome.tabs.query({'active': true}, function(tabs) {
+        chrome.tabs.update(request.tabid, {url:newUrl});
+      });
     }
   }
 });
