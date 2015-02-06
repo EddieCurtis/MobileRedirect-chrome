@@ -30,5 +30,7 @@ var shouldRedirect = function (urlString) {
 }
 
 var getStorageString = function (key) {
-  return "uk.co.uitwaaien.mobileredirect." + key;
+  // Domain name, e.g. "m.wikipedia.org"
+  var domain = key.replace(/.*:\/\//i, "").replace(/\/.*/i,"");
+  return "uk.co.uitwaaien.mobileredirect." + domain;
 }
