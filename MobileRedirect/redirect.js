@@ -14,17 +14,22 @@ chrome.webNavigation.onBeforeNavigate.addListener(function(request) {
 
 var shouldRedirect = function (urlString) {
   var storageKey = getStorageString(urlString);
-  var savedValue = chrome.storage.sync.get(storageKey, function() {});
+  var savedValue = chrome.storage.sync.get(storageKey, function(items) {
+    //TODO retrieve the value from the items object
+    console.log(items);
+  });
   
   if (savedValue == "false") {
     return false;
   }
   if (savedValue == null) {
-    chrome.storage.sync.set({storageKey:"true"});
+    var obj = {};
+    obj[storageKey] = "true";
     // TODO: Add callback where user has option to disable it for this url
     if (false) {
-      chrome.storage.sync.set({storageKey:"false"});
+      obj[storageKey] = "false";
     }
+    chrome.storage.sync.set(obj);
   }
   return true;
 }
