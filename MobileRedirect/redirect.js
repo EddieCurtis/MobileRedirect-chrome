@@ -3,12 +3,7 @@ chrome.webNavigation.onBeforeNavigate.addListener(function(request) {
   
   if(request.url.match(regex)) {
     console.log(request.url);
-    if (shouldRedirect(request.url)) {
-      var newUrl = request.url.replace(/(m|mobile)\./i, "");
-      chrome.tabs.query({'active': true}, function(tabs) {
-        chrome.tabs.update(request.tabId, {url:newUrl});
-      });
-    }
+    checkRedirect(request);
   }
 });
 
@@ -18,32 +13,42 @@ var notificationOptions = {
     message:'Redirecting to non-mobile version of this site.',
     iconUrl:'icon.png',
     buttons : [
-                { title:'Add exception' } ,
-                { title:'Ignore' }
+                { title:'Never redirect'},
+                { title:'Always redirect'}
               ]
 }
 
-var shouldRedirect = function (urlString) {
-  var storageKey = getStorageString(urlString);
-  var savedValue = chrome.storage.sync.get(storageKey, function(items) {
-    //TODO retrieve the value from the items object
-    console.log(items);
-  });
-  
-  if (savedValue == "false") {
-    return false;
-  }
-  if (savedValue == null) {
-    var obj = {};
-    obj[storageKey] = "true";
-    // TODO: Add callback where user has option to disable it for this url
-    chrome.notifications.create('notificationId', notificationOptions, function(id) {});
-    if (false) {
-      obj[storageKey] = "false";
+var checkRedirect = function (request) {
+  var storageKey = getStorageString(request.url);
+  var value = null;
+  chrome.storage.sync.get(storageKey, function(items) {
+    value = items[storageKey];
+    if (value == null) {
+      redirect(request);
+      chrome.notifications.create('notificationId', notificationOptions, function(id) {});
+      chrome.notifications.onButtonClicked.addListener(function(notificationId, buttonIndex) {
+         if (notificationId == 'notificationId') {
+           var obj = {};
+           if (buttonIndex == 0) {
+              obj[storageKey] = "false";
+           } else {
+              obj[storageKey] = "true";
+           }
+           chrome.storage.sync.set(obj);
+         }
+      });
+    } else if (value == "true") {
+       redirect(request);
     }
-    chrome.storage.sync.set(obj);
-  }
+  });
   return true;
+}
+
+var redirect = function(request) {
+    var newUrl = request.url.replace(/(m|mobile)\./i, "");
+      chrome.tabs.query({'active': true}, function(tabs) {
+        chrome.tabs.update(request.tabId, {url:newUrl});
+      });
 }
 
 var getStorageString = function (key) {
