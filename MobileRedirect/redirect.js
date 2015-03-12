@@ -6,7 +6,7 @@ chrome.webNavigation.onBeforeNavigate.addListener(function(request) {
     if (shouldRedirect(request.url)) {
       var newUrl = request.url.replace(/(m|mobile)\./i, "");
       chrome.tabs.query({'active': true}, function(tabs) {
-        chrome.tabs.update(request.tabid, {url:newUrl});
+        chrome.tabs.update(request.tabId, {url:newUrl});
       });
     }
   }
