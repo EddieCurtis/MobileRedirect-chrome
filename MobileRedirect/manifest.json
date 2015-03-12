@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Mobile Redirect",
-  "description": "An extension used to automatically switch to non-mobile versions of websites.",
+  "description": "Automatically switch to non-mobile versions of websites.",
   "version": "0.1",
   "author": "Eddie Curtis",
   "offline_enabled": false,
