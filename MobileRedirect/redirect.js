@@ -12,6 +12,17 @@ chrome.webNavigation.onBeforeNavigate.addListener(function(request) {
   }
 });
 
+var notificationOptions = {
+    type:'basic',
+    title:'Mobile Redirect',
+    message:'Redirecting to non-mobile version of this site.',
+    iconUrl:'icon.png',
+    buttons : [
+                { title:'Add exception' } ,
+                { title:'Ignore' }
+              ]
+}
+
 var shouldRedirect = function (urlString) {
   var storageKey = getStorageString(urlString);
   var savedValue = chrome.storage.sync.get(storageKey, function(items) {
@@ -26,6 +37,7 @@ var shouldRedirect = function (urlString) {
     var obj = {};
     obj[storageKey] = "true";
     // TODO: Add callback where user has option to disable it for this url
+    chrome.notifications.create('notificationId', notificationOptions, function(id) {});
     if (false) {
       obj[storageKey] = "false";
     }
